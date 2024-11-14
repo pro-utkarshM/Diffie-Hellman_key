@@ -12,8 +12,8 @@
 void handle_client(int client_socket) {
     char buffer[1024];
     int n;
-
-    // Receive public key from the client
+    
+    // Receive the encrypted message
     memset(buffer, 0, sizeof(buffer));
     n = read(client_socket, buffer, sizeof(buffer)-1);
     if (n < 0) {
@@ -21,14 +21,16 @@ void handle_client(int client_socket) {
         return;
     }
 
-    printf("Received public key: %s\n", buffer);
-    
-    // Send public key back to the client
-    n = write(client_socket, buffer, strlen(buffer));
-    if (n < 0) {
-        perror("Error writing to socket");
-        return;
+    printf("Received Encrypted Message: %s\n", buffer);
+
+    // Decrypt the message using Caesar cipher (For simplicity)
+    char decrypted_message[1024];
+    for (int i = 0; buffer[i] != '\0'; i++) {
+        decrypted_message[i] = buffer[i] - 3;  // Caesar Cipher decryption (shift by 3)
     }
+    decrypted_message[strlen(buffer)] = '\0';  // Null-terminate
+
+    printf("Decrypted Message: %s\n", decrypted_message);
 }
 
 int main() {
@@ -98,8 +100,8 @@ int main() {
     printf("Connected to Client 2...\n");
 
     // Handle communication with both clients
-    handle_client(client_socket1);  // Relay Client 1's public key
-    handle_client(client_socket2);  // Relay Client 2's public key
+    handle_client(client_socket1);  // Handle Client 1 message
+    handle_client(client_socket2);  // Handle Client 2 message
 
     close(client_socket1);
     close(client_socket2);
